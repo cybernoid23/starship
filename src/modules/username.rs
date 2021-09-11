@@ -8,6 +8,7 @@ const USERNAME_ENV_VAR: &str = "USER";
 
 #[cfg(target_os = "windows")]
 const USERNAME_ENV_VAR: &str = "USERNAME";
+use deelevate::{Token, PrivilegeLevel};
 
 /// Creates a module with the current user's username
 ///
@@ -69,7 +70,9 @@ fn is_login_user(context: &Context, username: &str) -> bool {
 
 #[cfg(target_os = "windows")]
 fn is_root_user() -> bool {
-    false
+    let token = Token::with_current_process().unwrap();
+    let level = token.privilege_level().unwrap();
+    if level == PrivilegeLevel::Elevated {return true} else {return false};
 }
 
 #[cfg(not(target_os = "windows"))]
